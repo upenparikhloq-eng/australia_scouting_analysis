@@ -77,7 +77,7 @@ def render_header() -> None:
         """
         <div class="hero">
           <h1>Australia ODI World Cup 2027</h1>
-          <p>Domestic Player Scouting Report · Five batters · Five fast-bowling prospects</p>
+          <p>Domestic Player Scouting Report · Five batters · Five bowling prospects</p>
           <div class="note">Evidence-led shortlist based on the supplied performance and phase-comparison datasets.</div>
         </div>
         """,
@@ -268,13 +268,6 @@ def page_executive_summary(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
         cols = existing(bowl, ["Bowler", "Matches", "Wickets", "Economy", "Bowling_Average"])
         show_table(bowl[cols].rename(columns=lambda c: c.replace("_", " ")), hide_index=True)
 
-    st.info(
-        "Interpretation note: these files provide the final shortlist and performance summaries, but do not include "
-        "the full source-delivery dataset or a complete written scoring specification. Any scoring formula, "
-        "eligibility check, or data-cleaning step should be backed by the project notebook/source code in the "
-        "final submission."
-    )
-
 
 def page_methodology(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
     st.subheader("Data and methodology")
@@ -298,19 +291,6 @@ def page_methodology(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
         "- **Context matters:** a high strike rate, low economy or high wicket count should not be used alone. "
         "Consider sample size, role, phase and trade-offs."
     )
-    st.warning(
-        "Transparency requirement: the CSVs contain scouting scores but not the complete formulas/weights behind "
-        "every score. Add the actual notebook methodology here before presenting this as a reproducible scoring "
-        "model; do not claim weights that are not documented."
-    )
-
-    st.markdown("### Important eligibility check")
-    st.write(
-        "If the project requirement is 'internationally uncapped', verify each player's senior men's international "
-        "appearances across all formats using a reliable source and record the check date/source. "
-        "The two CSVs alone cannot prove international eligibility."
-    )
-
 
 def page_batter_scouting(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
     st.subheader("Batter scouting")
@@ -463,19 +443,10 @@ def page_metric_dictionary(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
     for section, items in METRIC_DICTIONARY.items():
         st.markdown(f"### {section} metrics")
         show_table(pd.DataFrame(items, columns=["Metric", "Meaning / interpretation"]), hide_index=True)
-    st.warning(
-        "Do not replace undefined average/strike-rate values with zero when the denominator is zero. "
-        "'Undefined' means the metric cannot be calculated, not that the player performed at zero."
-    )
 
 
 def page_recommendations(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
-    st.subheader("Final recommendations")
-    st.write(
-        "Use the shortlist as a group of candidates for further review, not as an automatic final World Cup squad. "
-        "A recommendation should combine statistical evidence with role requirements, opposition/context, "
-        "fitness, fielding, and eligibility checks."
-    )
+    st.subheader("Final Summary")
 
     st.markdown("### Batters: what the supplied data indicates")
     sort_col = "Final_Performance_Score" if "Final_Performance_Score" in bat.columns else "Runs"
@@ -498,17 +469,6 @@ def page_recommendations(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
             phase_text = " / ".join(fmt_num(r[c], 0) for c in phase_wicket_cols)
             text += f" Phase wickets (Powerplay / middle / death): {phase_text}."
         st.markdown(text)
-
-    st.markdown("### Before final submission")
-    for step in [
-        "Attach the Jupyter Notebook and any Excel workbooks used.",
-        "Document every custom score's formula, normalisation, weights and treatment of missing values.",
-        "Show source-data dates, competition coverage, exclusions and validation checks.",
-        "Verify senior men's international caps and record sources for every candidate.",
-        "Add role-fit conclusions that follow from the evidence, including trade-offs and sample-size caveats.",
-    ]:
-        st.write(f"- {step}")
-
 
 def page_data_explorer(bat: pd.DataFrame, bowl: pd.DataFrame) -> None:
     st.subheader("Data explorer and supporting files")
